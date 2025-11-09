@@ -1,6 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:padding="16dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@android:drawable/ic_dialog_info"
+        app:tint="#FFFFFF" />
+
+
+    <TextView
+        android:id="@+id/txt_inventory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/logo"
+        android:layout_alignStart="@+id/logo"
+        android:text="Inventory"
+        android:textColor="#e7522e"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/txt_question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="¿Cuánto tengo de inventario?"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
+
+
+    <ImageView
+        android:id="@+id/eye_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignTop="@+id/txt_question"
+        android:layout_toStartOf="@+id/txt_question"
+        android:layout_marginEnd="8dp"
+        android:src="@android:drawable/ic_menu_view"
+        app:tint="#FFFFFF" />
+
+
+    <TextView
+        android:id="@+id/txt_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="$ ****"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/txt_manage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:text="Gestionar inventario"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
+
+
+    <ImageView
+        android:id="@+id/btn_manage"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignBottom="@+id/txt_manage"
+        android:layout_toStartOf="@+id/txt_manage"
+        android:layout_marginEnd="4dp"
+        android:src="@android:drawable/ic_menu_manage"
+        app:tint="#FA8523" />
+
+</RelativeLayout>
