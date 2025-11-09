@@ -6,17 +6,16 @@
     android:background="@drawable/widget_background"
     android:padding="16dp">
 
-
+    <!-- Logo en esquina superior izquierda -->
     <ImageView
         android:id="@+id/logo"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:src="@android:drawable/ic_dialog_info"
-        app:tint="#FFFFFF" />
+        android:src="@drawable/ic_manage" />
 
-
+    <!-- Texto "Inventory" debajo del logo -->
     <TextView
         android:id="@+id/txt_inventory"
         android:layout_width="wrap_content"
@@ -28,7 +27,7 @@
         android:textSize="14sp"
         android:textStyle="bold" />
 
-
+    <!-- Texto "¿Cuánto tengo de inventario?" en esquina superior derecha -->
     <TextView
         android:id="@+id/txt_question"
         android:layout_width="wrap_content"
@@ -39,29 +38,30 @@
         android:textColor="#FFFFFF"
         android:textSize="12sp" />
 
-
+    <!-- Ícono de ojo DESPUÉS del texto (a la derecha) -->
     <ImageView
         android:id="@+id/eye_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_alignTop="@+id/txt_question"
-        android:layout_toStartOf="@+id/txt_question"
-        android:layout_marginEnd="8dp"
+        android:layout_toEndOf="@+id/txt_question"
+        android:layout_marginStart="8dp"
         android:src="@android:drawable/ic_menu_view"
         app:tint="#FFFFFF" />
 
-
+    <!-- Saldo DEBAJO de "¿Cuánto tengo de inventario?" -->
     <TextView
         android:id="@+id/txt_balance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_below="@+id/txt_question"
+        android:layout_alignEnd="@+id/txt_question"
         android:text="$ ****"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textStyle="bold" />
 
-
+    <!-- Texto "Gestionar inventario" en esquina inferior derecha -->
     <TextView
         android:id="@+id/txt_manage"
         android:layout_width="wrap_content"
@@ -72,14 +72,14 @@
         android:textColor="#FFFFFF"
         android:textSize="12sp" />
 
-
+    <!-- Ícono de engranaje DESPUÉS del texto (a la derecha) -->
     <ImageView
         android:id="@+id/btn_manage"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_alignBottom="@+id/txt_manage"
-        android:layout_toStartOf="@+id/txt_manage"
-        android:layout_marginEnd="4dp"
+        android:layout_toEndOf="@+id/txt_manage"
+        android:layout_marginStart="4dp"
         android:src="@android:drawable/ic_menu_manage"
         app:tint="#FA8523" />
 

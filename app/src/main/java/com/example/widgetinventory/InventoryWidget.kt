@@ -5,7 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import kotlinx.coroutines.runBlocking
 import android.widget.RemoteViews
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -114,9 +114,17 @@ class InventoryWidget : AppWidgetProvider() {
     }
 
     private fun calculateTotalBalance(context: Context): Double {
-        // TODO: Implementar cálculo real con Room
-        // Por ahora retornamos un valor de ejemplo
-        return 3326000.0
+        return try {
+            val database = InventoryDatabase.getDatabase(context)
+
+            // Usar runBlocking para llamar a la función suspend desde el widget
+            return runBlocking {
+                database.productDao().getTotalBalance() ?: 0.0
+            }
+        } catch (e: Exception) {
+            // Si hay error, retornar 0.0
+            0.0
+        }
     }
 
     private fun formatBalance(balance: Double): String {
