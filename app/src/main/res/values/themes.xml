@@ -1,9 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.WidgetInventory" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.WidgetInventory" parent="Theme.Material3.DayNight">
+        <item name="colorPrimary">#e7522e</item>
+        <item name="colorPrimaryVariant">#FA8523</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
     </style>
-
-    <style name="Theme.WidgetInventory" parent="Base.Theme.WidgetInventory" />
 </resources>
