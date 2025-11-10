@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import kotlinx.coroutines.runBlocking
 import android.widget.RemoteViews
+import com.example.widgetinventory.data.db.InventoryDatabase
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -119,7 +120,7 @@ class InventoryWidget : AppWidgetProvider() {
 
             // Usar runBlocking para llamar a la función suspend desde el widget
             return runBlocking {
-                database.productDao().getTotalBalance() ?: 0.0
+                (database.productDao().getAllProductsForWidget() ?: 0.0) as Double
             }
         } catch (e: Exception) {
             // Si hay error, retornar 0.0
