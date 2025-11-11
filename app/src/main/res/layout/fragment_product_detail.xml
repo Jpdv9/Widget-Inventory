@@ -15,7 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/color_negro_transparente"
-        tools:context=".iu.detail.ProductDetailFragment">
+        tools:context=".iu.detail.ProductDetailFragment"
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -58,7 +59,7 @@
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
-                    android:text="@{product.name}"
+                    android:text="@{viewModel.product.name}"
                     tools:text="Zapatos" />
 
                 <Space
@@ -85,7 +86,7 @@
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
                         android:textColor="@color/orange_text_brand"
-                        android:text="@{String.valueOf(product.price)}"
+                        app:formattedPrice="@{viewModel.product.price}"
                         tools:text="23.000,00"/>
                 </LinearLayout>
 
@@ -109,7 +110,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
-                        android:text="@{String.valueOf(product.quantity)"
+                        android:text="@{String.valueOf(viewModel.product.quantity)}"
                         tools:text="256"/>
                 </LinearLayout>
 
@@ -140,7 +141,7 @@
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:textColor="@color/orange_text_brand"
-                        android:text="@{String.valueOf(product.total)}"
+                        app:formattedPrice="@{viewModel.total}"
                         tools:text="5.888.000,00"/>
                 </LinearLayout>
             </LinearLayout>

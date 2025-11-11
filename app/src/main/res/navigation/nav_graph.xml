@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/productDetailFragment">
+
+    <fragment
+        android:id="@+id/productDetailFragment"
+        android:name="com.example.widgetinventory.ui.detail.ProductDetailFragment"
+        android:label="fragment_product_detail"
+        tools:layout="@layout/fragment_product_detail">
+
+        <argument
+            android:name="productId"
+            app:argType="integer"
+            android:defaultValue="3"
+            />
+        <action
+            android:id="@+id/actionProductDetailFragmentToEditProductFragment"
+            app:destination="@id/editProductFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/editProductFragment"
+        android:name="com.example.widgetinventory.ui.edit.EditProductFragment"
+        android:label="fragment_edit_product"
+        tools:layout="@layout/fragment_edit_product">
+
+        <argument
+            android:name="productId"
+            app:argType="integer"
+            android:defaultValue="3"
+            />
+
+    </fragment>
 
 </navigation>

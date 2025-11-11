@@ -30,7 +30,7 @@ interface ProductDao {
 
     // Obtiene un producto por ID
     @Query("SELECT * FROM products WHERE id = :productId")
-    fun getProductById(productId: Int): Flow<Product>
+    fun getProductById(productId: Int): Flow<Product?>
 
     // Obtiene los productos para el cálculo del widget
     @Query("SELECT * FROM products")
