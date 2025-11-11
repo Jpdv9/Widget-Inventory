@@ -24,7 +24,7 @@
         </activity>
 
         <!-- 🔹 MainActivity: Pantalla secundaria (mantiene la barra si la necesita) -->
-        <activity android:name=".MainActivity" />
+        <activity android:name=".HomeInventarioActivity" />
 
         <!-- 🔹 Widget de inventario -->
         <receiver
