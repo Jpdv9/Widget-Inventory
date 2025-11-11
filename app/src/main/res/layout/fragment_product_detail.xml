@@ -174,8 +174,8 @@
             android:src="@drawable/ic_edit"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:backgroundTint="@color/orange_primary"
-            android:contentDescription="Editar producto"/>
+            android:backgroundTint="@color/orange_primary"/>
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

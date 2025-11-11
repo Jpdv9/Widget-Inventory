@@ -44,17 +44,16 @@
                 android:gravity="center_horizontal"
                 android:paddingBottom="50dp">
 
-                <!-- 1. ID DEL PRODUCTO -->
+                <!-- ID DEL PRODUCTO -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilProductId"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:hint="Código producto"
+                    android:hint="ID del Producto"
                     app:hintTextColor="@android:color/white"
-                    app:hintTextAppearance="@style/TextAppearance.AppCompat.Small"
-                    app:boxStrokeColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
                     app:boxBackgroundColor="#666666"
                     android:textColorHint="@android:color/white">
 
@@ -68,17 +67,16 @@
                         android:text="@={viewModel.code}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 2. NOMBRE DEL PRODUCTO -->
+                <!-- NOMBRE DEL PRODUCTO -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilProductName"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:hint="Nombre del producto"
+                    android:hint="Nombre del Producto"
                     app:hintTextColor="@android:color/white"
-                    app:hintTextAppearance="@style/TextAppearance.AppCompat.Small"
-                    app:boxStrokeColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
                     app:boxBackgroundColor="#666666"
                     android:textColorHint="@android:color/white">
 
@@ -92,17 +90,16 @@
                         android:text="@={viewModel.name}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 3. PRECIO DEL PRODUCTO -->
+                <!-- PRECIO DEL PRODUCTO -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilProductPrice"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:hint="Precio"
+                    android:hint="Precio ($)"
                     app:hintTextColor="@android:color/white"
-                    app:hintTextAppearance="@style/TextAppearance.AppCompat.Small"
-                    app:boxStrokeColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
                     app:boxBackgroundColor="#666666"
                     android:textColorHint="@android:color/white">
 
@@ -116,7 +113,7 @@
                         android:text="@={viewModel.price}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 4. CANTIDAD EN INVENTARIO -->
+                <!-- CANTIDAD EN INVENTARIO -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilProductQuantity"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
@@ -125,8 +122,7 @@
                     android:layout_marginBottom="32dp"
                     android:hint="Cantidad"
                     app:hintTextColor="@android:color/white"
-                    app:hintTextAppearance="@style/TextAppearance.AppCompat.Small"
-                    app:boxStrokeColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
                     app:boxBackgroundColor="#666666"
                     android:textColorHint="@android:color/white">
 
@@ -140,7 +136,7 @@
                         android:text="@={viewModel.quantity}"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- BOTÓN GUARDAR (Cumple Criterios 6 y 7) -->
+                <!-- BOTÓN GUARDAR  -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGuardar"
                     android:layout_width="match_parent"
