@@ -1,6 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.widgetinventory.ui.addproduct.AddProductViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_negro_transparente"
+        android:fitsSystemWindows="true"
+        tools:context="ui.addproduct.AddProductFragment">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#424242"
+            app:title="Agregar Producto"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:onClick="@{() -> viewModel.onBackClicked()}"/>
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingBottom="50dp">
+
+                <!-- ID DEL PRODUCTO -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilProductId"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="ID del Producto"
+                    app:hintTextColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
+                    app:boxBackgroundColor="#666666"
+                    android:textColorHint="@android:color/white">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etProductId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLength="4"
+                        android:inputType="number"
+                        android:textColor="@android:color/white"
+                        android:text="@={viewModel.code}"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- NOMBRE DEL PRODUCTO -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilProductName"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="Nombre del Producto"
+                    app:hintTextColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
+                    app:boxBackgroundColor="#666666"
+                    android:textColorHint="@android:color/white">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etProductName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords"
+                        android:maxLength="40"
+                        android:textColor="@android:color/white"
+                        android:text="@={viewModel.name}"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- PRECIO DEL PRODUCTO -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilProductPrice"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="Precio ($)"
+                    app:hintTextColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
+                    app:boxBackgroundColor="#666666"
+                    android:textColorHint="@android:color/white">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etProductPrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:maxLength="20"
+                        android:textColor="@android:color/white"
+                        android:text="@={viewModel.price}"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- CANTIDAD EN INVENTARIO -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilProductQuantity"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="32dp"
+                    android:hint="Cantidad"
+                    app:hintTextColor="@android:color/white"
+                    app:boxStrokeColor="#FA8523"
+                    app:boxBackgroundColor="#666666"
+                    android:textColorHint="@android:color/white">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etProductQuantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLength="4"
+                        android:inputType="number"
+                        android:textColor="@android:color/white"
+                        android:text="@={viewModel.quantity}"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- BOTÓN GUARDAR  -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGuardar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Guardar"
+                    android:backgroundTint="#FA8523"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    app:cornerRadius="50dp"
+                    android:enabled="@{viewModel.isFormValid()}"
+                    android:onClick="@{() -> viewModel.onSaveClicked()}"/>
+
+            </LinearLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

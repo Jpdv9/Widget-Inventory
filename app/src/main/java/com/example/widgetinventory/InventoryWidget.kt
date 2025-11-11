@@ -8,6 +8,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.example.widgetinventory.data.db.InventoryDatabase
 import com.example.widgetinventory.data.repository.ProductRepository
+import com.example.widgetinventory.ui.login.LoginActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

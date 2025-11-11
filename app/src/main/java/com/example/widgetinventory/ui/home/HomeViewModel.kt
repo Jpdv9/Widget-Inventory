@@ -1,4 +1,25 @@
 package com.example.widgetinventory.ui.home
 
-class HomeViewModel {
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import com.example.widgetinventory.data.db.InventoryDatabase
+import com.example.widgetinventory.data.model.Product
+import com.example.widgetinventory.data.repository.ProductRepository
+import kotlinx.coroutines.launch
+
+class HomeViewModel (application: Application) : AndroidViewModel(application) {
+
+    private val repository: ProductRepository
+    val allProducts by lazy { repository.allProducts.asLiveData() }
+
+    init {
+        val dao = InventoryDatabase.getDatabase(application).productDao()
+        repository = ProductRepository(dao)
+    }
+
+    fun deleteProduct(product: Product) = viewModelScope.launch {
+        repository.delete(product)
+    }
 }

@@ -1,13 +1,15 @@
-package com.example.widgetinventory
+package com.example.widgetinventory.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import android.widget.Toast
-import java.util.concurrent.Executor
 import com.airbnb.lottie.LottieAnimationView
+import com.example.widgetinventory.MainActivity
+import com.example.widgetinventory.R
+import java.util.concurrent.Executor
 
 class LoginActivity : AppCompatActivity() {
 
@@ -23,16 +25,19 @@ class LoginActivity : AppCompatActivity() {
         executor = ContextCompat.getMainExecutor(this)
 
         // Configurar el diálogo de autenticación biométrica
-        biometricPrompt = BiometricPrompt(this, executor,
+        biometricPrompt = BiometricPrompt(
+            this, executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    Toast.makeText(applicationContext, "Error: $errString", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Error: $errString", Toast.LENGTH_SHORT)
+                        .show()
                 }
 
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
-                    Toast.makeText(applicationContext, "Autenticación exitosa", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Autenticación exitosa", Toast.LENGTH_SHORT)
+                        .show()
 
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     startActivity(intent)
@@ -41,7 +46,8 @@ class LoginActivity : AppCompatActivity() {
 
                 override fun onAuthenticationFailed() {
                     super.onAuthenticationFailed()
-                    Toast.makeText(applicationContext, "Huella no reconocida", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(applicationContext, "Huella no reconocida", Toast.LENGTH_SHORT)
+                        .show()
                 }
             })
 
