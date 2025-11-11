@@ -163,7 +163,8 @@
             app:layout_constraintTop_toBottomOf="@+id/card_product_detail"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:background="@drawable/rounded_orange_button"/>
+            app:backgroundTint="@color/orange_primary"
+            app:cornerRadius="50dp"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_edit_product"

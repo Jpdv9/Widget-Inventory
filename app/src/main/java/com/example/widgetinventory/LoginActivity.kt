@@ -1,12 +1,13 @@
 package com.example.widgetinventory
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import android.widget.ImageView
 import android.widget.Toast
 import java.util.concurrent.Executor
+import com.airbnb.lottie.LottieAnimationView
 
 class LoginActivity : AppCompatActivity() {
 
@@ -32,9 +33,10 @@ class LoginActivity : AppCompatActivity() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     Toast.makeText(applicationContext, "Autenticación exitosa", Toast.LENGTH_SHORT).show()
-                    // Aquí podrías abrir tu MainActivity:
-                    // startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                    // finish()
+
+                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish() // Cierra el login para que no puedan volver
                 }
 
                 override fun onAuthenticationFailed() {
@@ -51,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
             .build()
 
         // Vincular la imagen de huella y activar la autenticación al presionarla
-        val fingerprintImage = findViewById<ImageView>(R.id.fingerprintAnimation)
+        val fingerprintImage = findViewById<LottieAnimationView>(R.id.fingerprintAnimation)
         fingerprintImage.setOnClickListener {
             biometricPrompt.authenticate(promptInfo)
         }

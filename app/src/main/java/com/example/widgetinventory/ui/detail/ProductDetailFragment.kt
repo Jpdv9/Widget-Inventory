@@ -28,38 +28,38 @@ class ProductDetailFragment : Fragment() {
     ): View {
         _binding = FragmentProductDetailBinding.inflate(inflater, container, false)
 
-        // 1. Configurar la Factory y el ViewModel
+        // Configurar la Factory y el ViewModel
         val application = requireNotNull(this.activity).application
         val dao = InventoryDatabase.getDatabase(application).productDao()
         val repository = ProductRepository(dao)
         val factory = DetailViewModelFactory(repository, args.productId)
         viewModel = ViewModelProvider(this, factory)[DetailViewModel::class.java]
 
-        // 2. Conectar el ViewModel y el Lifecycle al DataBinding
+        // Conectar el ViewModel y el Lifecycle al DataBinding
         binding.viewModel = viewModel
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        // 3. Configurar los observadores de navegación
+        // Configurar los observadores de navegación
         setupNavigationObservers()
 
-        // 4. Configurar los clics
+        // Configurar los clics
         setupClickListeners()
 
         return binding.root
     }
 
     private fun setupClickListeners() {
-        // Botón de Eliminar [cite: 177]
+        // Botón de Eliminar
         binding.btnDeleteProduct.setOnClickListener {
             showDeleteConfirmationDialog()
         }
 
-        // FAB de Editar [cite: 191]
+        // FAB de Editar
         binding.fabEditProduct.setOnClickListener {
             viewModel.onEditClicked()
         }
 
-        // Flecha de 'atrás' en la Toolbar [cite: 171]
+        // Flecha de 'atrás' en la Toolbar
         binding.toolbarDetail.setNavigationOnClickListener {
             viewModel.onBackClicked()
         }
@@ -69,10 +69,10 @@ class ProductDetailFragment : Fragment() {
         viewModel.navigateTo.observe(viewLifecycleOwner) { destination ->
             destination?.let {
                 when (it) {
-                    -1 -> { // Ir atrás (a Home)
+                    -1 -> {
                         findNavController().popBackStack()
                     }
-                    1 -> { // Ir a Editar
+                    1 -> {
                         val action = ProductDetailFragmentDirections
                             .actionProductDetailFragmentToEditProductFragment(args.productId)
                         findNavController().navigate(action)
@@ -89,7 +89,7 @@ class ProductDetailFragment : Fragment() {
             .setTitle("Confirmar eliminación")
             .setMessage("¿Estás seguro de que deseas eliminar este producto?")
             .setPositiveButton("Si") { _, _ ->
-                viewModel.onDeleteProduct() // Llama a la función del ViewModel [cite: 178]
+                viewModel.onDeleteProduct()
             }
             .setNegativeButton("No", null)
             .show()
