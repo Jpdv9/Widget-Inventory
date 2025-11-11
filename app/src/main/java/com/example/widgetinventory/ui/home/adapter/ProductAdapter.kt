@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.widgetinventory.R
 import com.example.widgetinventory.data.model.Product
+import java.text.NumberFormat
+import java.util.Locale
 
 class ProductAdapter(
     private var products: List<Product>,
@@ -29,7 +31,8 @@ class ProductAdapter(
         val product = products[position]
         holder.tvName.text = product.name
         holder.tvId.text = "ID: ${product.id}"
-        holder.tvPrice.text = "$${"%,.2f".format(product.price)}"
+        val formatter = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
+        holder.tvPrice.text = formatter.format(product.price)
         holder.itemView.setOnClickListener { onClick(product) }
     }
 

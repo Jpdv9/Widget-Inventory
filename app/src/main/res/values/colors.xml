@@ -11,4 +11,5 @@
     <color name="orange_primary">#FA8523</color>
     <color name="color_negro_transparente">#CC000000</color>
     <color name="color_gris_toolbar">#424242</color>
+    <color name="box_stroke_static_white">#FFFFFF</color>
 </resources>

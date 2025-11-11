@@ -1,6 +1,8 @@
 package com.example.widgetinventory.ui.login
 
 import android.content.Intent
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,8 +19,21 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
+    companion object {
+        private const val PREFS_NAME = "InventoryPrefs"
+        // Clave de sesión:
+        private const val KEY_IS_LOGGED_IN = "is_logged_in"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Verificar Sesión Guardada
+        if (isSessionActive()) {
+            navigateToHome()
+            return
+        }
+
         setContentView(R.layout.activity_login)
 
         // Inicializar el ejecutor
@@ -39,9 +54,10 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "Autenticación exitosa", Toast.LENGTH_SHORT)
                         .show()
 
-                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish() // Cierra el login para que no puedan volver
+                    saveSessionState(true)
+
+                    navigateToHome()
+
                 }
 
                 override fun onAuthenticationFailed() {
@@ -64,4 +80,28 @@ class LoginActivity : AppCompatActivity() {
             biometricPrompt.authenticate(promptInfo)
         }
     }
+
+
+    private fun navigateToHome() {
+        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        startActivity(intent)
+        finish() // Cierra el login para que no puedan volver
+    }
+
+
+    private fun isSessionActive(): Boolean {
+        val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        // Devuelve 'true' si la clave existe y su valor es 'true', 'false' por defecto.
+        return prefs.getBoolean(KEY_IS_LOGGED_IN, false)
+    }
+
+
+    fun saveSessionState(is_logged_in: Boolean) {
+        val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putBoolean(KEY_IS_LOGGED_IN, is_logged_in)
+        editor.apply() // Guarda los cambios de forma asíncrona
+    }
+
+
 }
