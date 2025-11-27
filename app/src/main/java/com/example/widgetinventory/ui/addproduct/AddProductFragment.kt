@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.widgetinventory.R
-import com.example.widgetinventory.data.db.InventoryDatabase
 import com.example.widgetinventory.data.repository.ProductRepository
 import com.example.widgetinventory.databinding.FragmentAddProductBinding
 
@@ -26,9 +25,7 @@ class AddProductFragment : Fragment() {
         _binding = FragmentAddProductBinding.inflate(inflater, container, false)
 
         // Configurar la Factory y el ViewModel
-        val application = requireNotNull(this.activity).application
-        val dao = InventoryDatabase.getDatabase(application).productDao()
-        val repository = ProductRepository(dao)
+        val repository = ProductRepository()
         val factory = AddProductViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory)[AddProductViewModel::class.java]
 

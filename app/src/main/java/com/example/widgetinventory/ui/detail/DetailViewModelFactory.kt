@@ -6,7 +6,7 @@ import com.example.widgetinventory.data.repository.ProductRepository
 
 class DetailViewModelFactory(
     private val repository: ProductRepository,
-    private val productId: Int
+    private val productId: String
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
