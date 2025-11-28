@@ -1,37 +1,66 @@
 package com.example.widgetinventory.data.repository
 
-import com.example.widgetinventory.data.db.ProductDao
 import com.example.widgetinventory.data.model.Product
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.channels.awaitClose
 
-class ProductRepository(private val productDao: ProductDao) {
+class ProductRepository {
 
-    // Obtiene la lista de productos (para HU 3.0)
-    val allProducts: Flow<List<Product>> = productDao.getAllProducts()
+    // Obtenemos la instancia de la base de datos de Firestore
+    private val productsCollection = FirebaseFirestore.getInstance().collection("products")
 
-    // Obtiene un producto por ID (para HU 5.0 y 6.0)
-    fun getProductById(id: Int): Flow<Product> {
-        return productDao.getProductById(id)
+    // Obtiene la lista de productos en tiempo real desde Firestore
+    fun getAllProducts(): Flow<List<Product>> = callbackFlow {
+        val listener = productsCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error) // Cierra el Flow con error si algo sale mal
+                return@addSnapshotListener
+            }
+
+            val productList = snapshot?.documents?.mapNotNull { document ->
+                val product = document.toObject(Product::class.java)
+                product?.id = document.id // Asignamos el ID del documento
+                product
+            } ?: emptyList()
+
+            trySend(productList) // Enviamos la lista actualizada al Flow
+        }
+
+        // Cuando el Flow se cancele, removemos el listener para evitar memory leaks
+        awaitClose { listener.remove() }
     }
 
-    // Inserta un producto (para HU 4.0)
+    // Inserta un producto
     suspend fun insert(product: Product) {
-        productDao.insertProduct(product)
+        productsCollection.add(product).await()
     }
 
-    // Actualiza un producto (para HU 6.0)
+    // Actualiza un producto
     suspend fun update(product: Product) {
-        productDao.updateProduct(product)
+        if (product.id.isNotEmpty()) {
+            productsCollection.document(product.id).set(product).await()
+        }
     }
 
-    // Elimina un producto (para HU 5.0)
-    suspend fun delete(product: Product) {
-        productDao.deleteProduct(product)
+    // Elimina un producto por su ID
+    suspend fun delete(productId: String) {
+        productsCollection.document(productId).delete().await()
     }
 
-    // Obtiene los productos para el widget (HU 1.0)
-    // Esta función es 'suspend' porque el Widget no usa Flow
+    // Obtiene los productos para el widget (versión para Firestore)
     suspend fun getProductsForWidget(): List<Product> {
-        return productDao.getAllProductsForWidget()
+        return try {
+            val snapshot = productsCollection.get().await()
+            snapshot.documents.mapNotNull { document ->
+                val product = document.toObject(Product::class.java)
+                product?.id = document.id
+                product
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }
