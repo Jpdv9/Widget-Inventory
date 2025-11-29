@@ -1,46 +1,66 @@
 package com.example.widgetinventory.data.repository
 
-import com.example.widgetinventory.data.db.ProductDao
 import com.example.widgetinventory.data.model.Product
-import kotlinx.coroutines.Dispatchers // <-- ¡AÑADE ESTE IMPORT!
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext // <-- ¡AÑADE ESTE IMPORT!
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.channels.awaitClose
 
-class ProductRepository(private val productDao: ProductDao) {
+class ProductRepository {
 
-    // Obtiene la lista de productos
-    val allProducts: Flow<List<Product>> = productDao.getAllProducts()
+    // Obtenemos la instancia de la base de datos de Firestore
+    private val productsCollection = FirebaseFirestore.getInstance().collection("products")
 
-    // Obtiene un producto por ID
-    fun getProductById(id: Int): Flow<Product?> {
-        return productDao.getProductById(id)
+    // Obtiene la lista de productos en tiempo real desde Firestore
+    fun getAllProducts(): Flow<List<Product>> = callbackFlow {
+        val listener = productsCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error) // Cierra el Flow con error si algo sale mal
+                return@addSnapshotListener
+            }
+
+            val productList = snapshot?.documents?.mapNotNull { document ->
+                val product = document.toObject(Product::class.java)
+                product?.id = document.id // Asignamos el ID del documento
+                product
+            } ?: emptyList()
+
+            trySend(productList) // Enviamos la lista actualizada al Flow
+        }
+
+        // Cuando el Flow se cancele, removemos el listener para evitar memory leaks
+        awaitClose { listener.remove() }
     }
 
     // Inserta un producto
     suspend fun insert(product: Product) {
-        withContext(Dispatchers.IO) {
-            productDao.insertProduct(product)
-        }
+        productsCollection.add(product).await()
     }
 
     // Actualiza un producto
     suspend fun update(product: Product) {
-        withContext(Dispatchers.IO) {
-            productDao.updateProduct(product)
+        if (product.id.isNotEmpty()) {
+            productsCollection.document(product.id).set(product).await()
         }
     }
 
-    // Elimina un producto
-    suspend fun delete(product: Product) {
-        withContext(Dispatchers.IO) {
-            productDao.deleteProduct(product)
-        }
+    // Elimina un producto por su ID
+    suspend fun delete(productId: String) {
+        productsCollection.document(productId).delete().await()
     }
 
-    // Obtiene los productos para el widget
+    // Obtiene los productos para el widget (versión para Firestore)
     suspend fun getProductsForWidget(): List<Product> {
-        return withContext(Dispatchers.IO) {
-            productDao.getAllProductsForWidget()
+        return try {
+            val snapshot = productsCollection.get().await()
+            snapshot.documents.mapNotNull { document ->
+                val product = document.toObject(Product::class.java)
+                product?.id = document.id
+                product
+            }
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }

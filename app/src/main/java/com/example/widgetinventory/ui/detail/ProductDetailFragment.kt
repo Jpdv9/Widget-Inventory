@@ -10,9 +10,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.widgetinventory.R
-import com.example.widgetinventory.data.db.InventoryDatabase
 import com.example.widgetinventory.data.repository.ProductRepository
 import com.example.widgetinventory.databinding.FragmentProductDetailBinding
+
 
 class ProductDetailFragment : Fragment() {
 
@@ -29,10 +29,8 @@ class ProductDetailFragment : Fragment() {
         _binding = FragmentProductDetailBinding.inflate(inflater, container, false)
 
         // Configurar la Factory y el ViewModel
-        val application = requireNotNull(this.activity).application
-        val dao = InventoryDatabase.getDatabase(application).productDao()
-        val repository = ProductRepository(dao)
-        val factory = DetailViewModelFactory(repository, args.productId)
+        val repository = ProductRepository()
+        val factory = DetailViewModelFactory(repository, args.productId.toString())
         viewModel = ViewModelProvider(this, factory)[DetailViewModel::class.java]
 
         // Conectar el ViewModel y el Lifecycle al DataBinding

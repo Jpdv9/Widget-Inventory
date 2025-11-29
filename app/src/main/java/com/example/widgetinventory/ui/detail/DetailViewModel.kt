@@ -8,15 +8,18 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.widgetinventory.data.model.Product
 import com.example.widgetinventory.data.repository.ProductRepository
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DetailViewModel(
     private val repository: ProductRepository,
-    private val productId: Int
+    private val productId: String
 ) : ViewModel() {
 
-    // Carga el producto desde la BD usando el ID
-    val product: LiveData<Product?> = repository.getProductById(productId).asLiveData()
+    // Carga el producto desde el Flow de la lista completa
+    val product: LiveData<Product?> = repository.getAllProducts().map { productList ->
+        productList.find { it.id == productId }
+    }.asLiveData()
 
     // Calcula el total del producto
     val total: LiveData<Double> = product.map { product ->
@@ -33,25 +36,22 @@ class DetailViewModel(
     fun onDeleteProduct() {
         viewModelScope.launch {
             product.value?.let {
-                repository.delete(it)
-                // Navega de regreso al Home después de borrar el producto
+                // Pasamos solo el ID al repositorio para eliminar el producto
+                repository.delete(it.id)
                 _navigateTo.value = -1
             }
         }
     }
 
-    //Lógica para ir a Editar
+    // Lógica para editar el producto
     fun onEditClicked() {
-        // Navega a la pantalla de Edición
         _navigateTo.value = 1
     }
 
-    // Lógica para el botón de 'atrás'
     fun onBackClicked() {
         _navigateTo.value = -1
     }
 
-    //Resetea el evento de navegación
     fun onNavigationDone() {
         _navigateTo.value = null
     }

@@ -51,7 +51,8 @@ class AddProductViewModel(private val repository: ProductRepository) : ViewModel
         try {
             // Creamos el producto con los datos de los LiveData
             val newProduct = Product(
-                id = code.value!!.toInt(),
+                id = "", // Se genera en la BD
+                code = code.value!!.toInt(),
                 name = name.value!!,
                 price = price.value!!.toDouble(),
                 quantity = quantity.value!!.toInt()
