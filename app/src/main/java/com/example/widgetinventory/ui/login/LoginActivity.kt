@@ -19,16 +19,21 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
+    // Saber si la app se abrió desde el widget
+    private var openedFromWidget = false
+
     companion object {
         private const val PREFS_NAME = "InventoryPrefs"
-        // Clave de sesión:
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Verificar Sesión Guardada
+        // Saber si viene del widget
+        openedFromWidget = intent.getBooleanExtra("fromWidget", false)
+
+        // Si ya estaba logueado → ir directo al Home
         if (isSessionActive()) {
             navigateToHome()
             return
@@ -39,10 +44,11 @@ class LoginActivity : AppCompatActivity() {
         // Inicializar el ejecutor
         executor = ContextCompat.getMainExecutor(this)
 
-        // Configurar el diálogo de autenticación biométrica
+        // Configurar autenticación biométrica
         biometricPrompt = BiometricPrompt(
             this, executor,
             object : BiometricPrompt.AuthenticationCallback() {
+
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
                     Toast.makeText(applicationContext, "Error: $errString", Toast.LENGTH_SHORT)
@@ -56,8 +62,8 @@ class LoginActivity : AppCompatActivity() {
 
                     saveSessionState(true)
 
+                    // Redirigir al Home (venga del widget o no)
                     navigateToHome()
-
                 }
 
                 override fun onAuthenticationFailed() {
@@ -65,43 +71,37 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(applicationContext, "Huella no reconocida", Toast.LENGTH_SHORT)
                         .show()
                 }
-            })
+            }
+        )
 
-        // Configurar el contenido del cuadro emergente
         promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Autenticación con Biometría")
             .setSubtitle("Ingrese su huella digital")
             .setNegativeButtonText("Cancelar")
             .build()
 
-        // Vincular la imagen de huella y activar la autenticación al presionarla
         val fingerprintImage = findViewById<LottieAnimationView>(R.id.fingerprintAnimation)
         fingerprintImage.setOnClickListener {
             biometricPrompt.authenticate(promptInfo)
         }
     }
 
-
+    // Lleva al usuario al Home
     private fun navigateToHome() {
-        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
+            putExtra("fromWidget", openedFromWidget)
+        }
         startActivity(intent)
-        finish() // Cierra el login para que no puedan volver
+        finish()
     }
-
 
     private fun isSessionActive(): Boolean {
         val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        // Devuelve 'true' si la clave existe y su valor es 'true', 'false' por defecto.
         return prefs.getBoolean(KEY_IS_LOGGED_IN, false)
     }
 
-
     fun saveSessionState(is_logged_in: Boolean) {
         val prefs: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val editor = prefs.edit()
-        editor.putBoolean(KEY_IS_LOGGED_IN, is_logged_in)
-        editor.apply() // Guarda los cambios de forma asíncrona
+        prefs.edit().putBoolean(KEY_IS_LOGGED_IN, is_logged_in).apply()
     }
-
-
 }
