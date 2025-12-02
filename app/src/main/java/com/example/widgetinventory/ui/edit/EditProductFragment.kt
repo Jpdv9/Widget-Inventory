@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.widgetinventory.R
 import com.example.widgetinventory.databinding.FragmentEditProductBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -31,7 +32,10 @@ class EditProductFragment : Fragment() {
 
         viewModel.navigateBack.observe(viewLifecycleOwner) { navigate ->
             if (navigate == true) {
-                findNavController().popBackStack()
+                // Navegamos a Home y limpiamos la pila hasta Home
+                findNavController().navigate(R.id.homeFragment, null, androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(R.id.homeFragment, true)
+                    .build())
                 viewModel.onNavigationDone()
             }
         }
