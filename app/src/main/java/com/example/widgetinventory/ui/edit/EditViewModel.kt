@@ -10,7 +10,9 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.widgetinventory.data.model.Product
 import com.example.widgetinventory.data.repository.ProductRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -25,7 +27,9 @@ class EditViewModel @Inject constructor(
     // Obtenemos el productId desde el SavedStateHandle
     private val productId: String = savedStateHandle.get<String>("productId")!!
 
-    private val productFlow = repository.getAllProducts().map { productList ->
+    private val productFlow = (FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
+        repository.getAllProducts(userId)
+    } ?: emptyFlow()).map { productList ->
         productList.find { it.id == productId }
     }
     val product: LiveData<Product?> = productFlow.asLiveData()

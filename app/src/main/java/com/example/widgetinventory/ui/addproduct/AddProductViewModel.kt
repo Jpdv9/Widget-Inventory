@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.widgetinventory.data.model.Product
 import com.example.widgetinventory.data.repository.ProductRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,13 +55,15 @@ class AddProductViewModel @Inject constructor(
         if (!areFieldsValid()) return
 
         try {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
             // Creamos el producto con los datos de los LiveData
             val newProduct = Product(
                 id = "", // Se genera en la BD
                 code = code.value!!.toInt(),
                 name = name.value!!,
                 price = price.value!!.toDouble(),
-                quantity = quantity.value!!.toInt()
+                quantity = quantity.value!!.toInt(),
+                userId = userId
             )
 
             // Usamos una corrutina para insertar en la BD
@@ -69,7 +72,7 @@ class AddProductViewModel @Inject constructor(
                 _navigateToHome.value = true // Navega de regreso a Home
             }
         } catch (e: Exception) {
-            // Manejar error (ej. si el usuario pone "hola" en el precio)
+            // Manejar error (ej. si el usuario pone \"hola\" en el precio)
             // (Puedes mostrar un Toast aquí)
         }
     }

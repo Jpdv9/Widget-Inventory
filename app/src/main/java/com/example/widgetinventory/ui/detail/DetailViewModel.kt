@@ -9,7 +9,9 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.widgetinventory.data.model.Product
 import com.example.widgetinventory.data.repository.ProductRepository
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,12 +25,20 @@ class DetailViewModel @Inject constructor(
     // Obtenemos el productId desde el SavedStateHandle
     private val productId: String = savedStateHandle.get<String>("productId")!!
 
-    //
-
     // Carga el producto desde el Flow de la lista completa
-    val product: LiveData<Product?> = repository.getAllProducts().map { productList ->
-        productList.find { it.id == productId }
-    }.asLiveData()
+    val product: LiveData<Product?>
+
+    init {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val productsFlow = if (userId != null) {
+            repository.getAllProducts(userId)
+        } else {
+            emptyFlow()
+        }
+        product = productsFlow.map { productList ->
+            productList.find { it.id == productId }
+        }.asLiveData()
+    }
 
     // Calcula el total del producto
     val total: LiveData<Double> = product.map { product ->

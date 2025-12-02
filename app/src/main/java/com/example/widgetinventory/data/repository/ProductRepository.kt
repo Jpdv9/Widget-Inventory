@@ -12,22 +12,23 @@ class ProductRepository {
     // Obtenemos la instancia de la base de datos de Firestore
     private val productsCollection = FirebaseFirestore.getInstance().collection("products")
 
-    // Obtiene la lista de productos en tiempo real desde Firestore
-    fun getAllProducts(): Flow<List<Product>> = callbackFlow {
-        val listener = productsCollection.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error) // Cierra el Flow con error si algo sale mal
-                return@addSnapshotListener
+    // Obtiene la lista de productos en tiempo real desde Firestore para un usuario específico
+    fun getAllProducts(userId: String): Flow<List<Product>> = callbackFlow {
+        val listener = productsCollection.whereEqualTo("userId", userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error) // Cierra el Flow con error si algo sale mal
+                    return@addSnapshotListener
+                }
+
+                val productList = snapshot?.documents?.mapNotNull { document ->
+                    val product = document.toObject(Product::class.java)
+                    product?.id = document.id // Asignamos el ID del documento
+                    product
+                } ?: emptyList()
+
+                trySend(productList) // Enviamos la lista actualizada al Flow
             }
-
-            val productList = snapshot?.documents?.mapNotNull { document ->
-                val product = document.toObject(Product::class.java)
-                product?.id = document.id // Asignamos el ID del documento
-                product
-            } ?: emptyList()
-
-            trySend(productList) // Enviamos la lista actualizada al Flow
-        }
 
         // Cuando el Flow se cancele, removemos el listener para evitar memory leaks
         awaitClose { listener.remove() }
@@ -50,10 +51,10 @@ class ProductRepository {
         productsCollection.document(productId).delete().await()
     }
 
-    // Obtiene los productos para el widget (versión para Firestore)
-    suspend fun getProductsForWidget(): List<Product> {
+    // Obtiene los productos para el widget (versión para Firestore) para un usuario específico
+    suspend fun getProductsForWidget(userId: String): List<Product> {
         return try {
-            val snapshot = productsCollection.get().await()
+            val snapshot = productsCollection.whereEqualTo("userId", userId).get().await()
             snapshot.documents.mapNotNull { document ->
                 val product = document.toObject(Product::class.java)
                 product?.id = document.id
