@@ -8,18 +8,21 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.asLiveData
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.widgetinventory.R
 import com.example.widgetinventory.databinding.FragmentHomeBinding
 import com.example.widgetinventory.ui.home.adapter.ProductAdapter
 import com.example.widgetinventory.ui.login.LoginActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint // <-- 1. AÑADIR ESTA ANOTACIÓN
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    // Con Hilt, esta línea es suficiente para obtener el ViewModel
     private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
@@ -36,7 +39,8 @@ class HomeFragment : Fragment() {
         binding.recyclerProducts.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerProducts.adapter = adapter
 
-        viewModel.allProducts.asLiveData().observe(viewLifecycleOwner) { products ->
+        // 2. CORRECCIÓN: Quitamos el ".asLiveData()" que sobraba
+        viewModel.allProducts.observe(viewLifecycleOwner) { products ->
             binding.progressBar.visibility = if (products.isNullOrEmpty()) View.VISIBLE else View.GONE
             adapter.updateList(products)
         }
@@ -52,10 +56,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.findViewById<ImageView>(R.id.btnCerrarSesion).setOnClickListener {
-            // 1. Cerrar sesión en Firebase
             viewModel.signOut()
-
-            // 2. Navegar a LoginActivity y limpiar la pila
             val intent = Intent(requireContext(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
