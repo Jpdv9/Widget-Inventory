@@ -7,14 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.widgetinventory.data.model.Product
 import com.example.widgetinventory.data.repository.ProductRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AddProductViewModel @Inject constructor(
-    private val repository: ProductRepository
-) : ViewModel() {
+class AddProductViewModel(private val repository: ProductRepository) : ViewModel() {
 
     // 1. LiveData para los 4 campos de texto (para Two-Way DataBinding)
     val code = MutableLiveData<String>()
@@ -22,7 +17,7 @@ class AddProductViewModel @Inject constructor(
     val price = MutableLiveData<String>()
     val quantity = MutableLiveData<String>()
 
-    // 2. LiveData para habilitar/deshabilitar el botón
+    // 2. LiveData para habilitar/deshabilitar el botón (Criterio 6)
     val isFormValid = MediatorLiveData<Boolean>().apply {
         addSource(code) { value = areFieldsValid() }
         addSource(name) { value = areFieldsValid() }
@@ -49,7 +44,7 @@ class AddProductViewModel @Inject constructor(
         _navigateToHome.value = true
     }
 
-    // 4. Lógica de guardado
+    // 4. Lógica de guardado (Criterio 8)
     fun onSaveClicked() {
         if (!areFieldsValid()) return
 
