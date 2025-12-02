@@ -5,18 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.widgetinventory.R
+import com.example.widgetinventory.data.repository.ProductRepository
 import com.example.widgetinventory.databinding.FragmentAddProductBinding
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class AddProductFragment : Fragment() {
 
     private var _binding: FragmentAddProductBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: AddProductViewModel by viewModels()
+    private lateinit var viewModel: AddProductViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,14 +24,20 @@ class AddProductFragment : Fragment() {
     ): View {
         _binding = FragmentAddProductBinding.inflate(inflater, container, false)
 
+        // Configurar la Factory y el ViewModel
+        val repository = ProductRepository()
+        val factory = AddProductViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, factory)[AddProductViewModel::class.java]
 
+        // Conectar el ViewModel y el Lifecycle al DataBinding
         binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
+        binding.lifecycleOwner = this.viewLifecycleOwner
 
-        // Observador para la navegación (esto se queda igual)
+        // 3. Observar la navegación
         viewModel.navigateToHome.observe(viewLifecycleOwner) { navigate ->
             if (navigate == true) {
-                findNavController().popBackStack()
+                // Volvemos al HomeFragment
+                findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
                 viewModel.onNavigationDone()
             }
         }
