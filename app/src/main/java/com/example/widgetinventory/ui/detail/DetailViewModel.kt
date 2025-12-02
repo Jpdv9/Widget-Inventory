@@ -2,19 +2,28 @@ package com.example.widgetinventory.ui.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.widgetinventory.data.model.Product
 import com.example.widgetinventory.data.repository.ProductRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DetailViewModel(
+@HiltViewModel
+class DetailViewModel @Inject constructor(
     private val repository: ProductRepository,
-    private val productId: String
+    savedStateHandle: SavedStateHandle //
 ) : ViewModel() {
+
+    // Obtenemos el productId desde el SavedStateHandle
+    private val productId: String = savedStateHandle.get<String>("productId")!!
+
+    //
 
     // Carga el producto desde el Flow de la lista completa
     val product: LiveData<Product?> = repository.getAllProducts().map { productList ->

@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import com.example.widgetinventory.ui.login.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
@@ -122,7 +123,8 @@ class InventoryWidget : AppWidgetProvider() {
         } else {
             // ✔ Usuario logueado → enviar BROADCAST al widget para hacer toggle
             val intent = Intent(context, InventoryWidget::class.java).apply {
-                Intent.setAction = TOGGLE_BALANCE_ACTION
+                // Así se establece la acción correctamente
+                action = TOGGLE_BALANCE_ACTION
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
             }
 

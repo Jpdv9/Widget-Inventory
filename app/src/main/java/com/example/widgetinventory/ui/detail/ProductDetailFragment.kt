@@ -6,20 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.example.widgetinventory.data.repository.ProductRepository
 import com.example.widgetinventory.databinding.FragmentProductDetailBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class ProductDetailFragment : Fragment() {
 
     private var _binding: FragmentProductDetailBinding? = null
     private val binding get() = _binding!!
+    private val viewModel: DetailViewModel by viewModels()
 
-    private lateinit var viewModel: DetailViewModel
-    private val args: ProductDetailFragmentArgs by this.navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,19 +25,13 @@ class ProductDetailFragment : Fragment() {
     ): View {
         _binding = FragmentProductDetailBinding.inflate(inflater, container, false)
 
-        // Configurar la Factory y el ViewModel
-        val repository = ProductRepository()
-        val factory = DetailViewModelFactory(repository, args.productId.toString())
-        viewModel = ViewModelProvider(this, factory)[DetailViewModel::class.java]
 
-        // Conectar el ViewModel y el Lifecycle al DataBinding
+        // Conectamos el ViewModel y el Lifecycle al DataBinding
         binding.viewModel = viewModel
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        // Configurar los observadores de navegación
+        // Configurar los observadores
         setupNavigationObservers()
-
-        // Configurar los clics
         setupClickListeners()
 
         return binding.root
@@ -70,9 +62,12 @@ class ProductDetailFragment : Fragment() {
                         findNavController().popBackStack()
                     }
                     1 -> {
-                        val action = ProductDetailFragmentDirections
-                            .actionProductDetailFragmentToEditProductFragment(args.productId)
-                        findNavController().navigate(action)
+                        // Navegación más robusta, usando el ID del producto desde el ViewModel
+                        viewModel.product.value?.id?.let { prodId ->
+                            val action = ProductDetailFragmentDirections
+                                .actionProductDetailFragmentToEditProductFragment(prodId)
+                            findNavController().navigate(action)
+                        }
                     }
                 }
                 viewModel.onNavigationDone()

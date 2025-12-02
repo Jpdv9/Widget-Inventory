@@ -4,4 +4,5 @@
         alias(libs.plugins.kotlin.android) apply false
         alias(libs.plugins.androidx.navigation.safeargs.kotlin) apply false
         alias(libs.plugins.google.gms.google.services) apply false
+        alias(libs.plugins.dagger.hilt.android) apply false
     }

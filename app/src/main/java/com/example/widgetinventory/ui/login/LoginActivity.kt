@@ -1,5 +1,6 @@
 package com.example.widgetinventory.ui.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -7,12 +8,13 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.widgetinventory.MainActivity
 import com.example.widgetinventory.R
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
-
 
     private lateinit var inputEmail: TextInputEditText
     private lateinit var inputPassword: TextInputEditText
@@ -22,13 +24,17 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var btnRegister: TextView
 
+    // 1. Añadimos una instancia de FirebaseAuth
+    private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // 2. Inicializamos Firebase Auth
+        firebaseAuth = FirebaseAuth.getInstance()
 
-        // Inicializar vistas
+        // ... (inicialización de vistas no cambia)
         inputEmail = findViewById(R.id.inputEmail)
         inputPassword = findViewById(R.id.inputPassword)
         emailLayout = findViewById(R.id.emailLayout)
@@ -37,41 +43,55 @@ class LoginActivity : AppCompatActivity() {
         btnLogin = findViewById(R.id.btnLogin)
         btnRegister = findViewById(R.id.btnRegister)
 
-        // Inactivar botones al inicio
+        // ... (validaciones no cambian)
         btnLogin.isEnabled = false
         btnRegister.isEnabled = false
-
-        // Validar Email y Password
         inputEmail.addTextChangedListener(formWatcher)
         inputPassword.addTextChangedListener(formWatcher)
 
-        // Acción de Login
+        // 3. Modificamos la acción de Login
         btnLogin.setOnClickListener {
-            Toast.makeText(this, "Intentando iniciar sesión...", Toast.LENGTH_SHORT).show()
+            val email = inputEmail.text.toString().trim()
+            val password = inputPassword.text.toString().trim()
+
+            // Deshabilitamos el botón para dar feedback al usuario
+            btnLogin.isEnabled = false
+            btnLogin.text = "INICIANDO..."
+
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Si el login es exitoso, navegamos a la pantalla principal
+                        Toast.makeText(this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        finish() // Cerramos la LoginActivity para que el usuario no pueda volver
+                    } else {
+                        // Si el login falla, mostramos un error y reactivamos el botón
+                        Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                        btnLogin.isEnabled = true
+                        btnLogin.text = "INICIAR SESIÓN"
+                    }
+                }
         }
 
-        // Acción de Registrarse
+        // ... (el resto del archivo no cambia)
         btnRegister.setOnClickListener {
             Toast.makeText(this, "Ir a pantalla de registro...", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Watcher para validar email y password en tiempo real
     private val formWatcher = object : TextWatcher {
+        // ... (código del watcher no cambia)
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            validateForm()
-        }
-
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { validateForm() }
         override fun afterTextChanged(s: Editable?) {}
     }
 
     private fun validateForm() {
+        // ... (código de validación no cambia)
         val email = inputEmail.text.toString().trim()
         val password = inputPassword.text.toString().trim()
-
-        // Validación Password 6-10 dígitos solo números
         if (password.length in 1..5) {
             errorPassword.text = "Mínimo 6 dígitos"
             errorPassword.visibility = TextView.VISIBLE
@@ -80,13 +100,8 @@ class LoginActivity : AppCompatActivity() {
             errorPassword.visibility = TextView.GONE
             passwordLayout.boxStrokeColor = getColor(android.R.color.white)
         }
-
-        // Activar Login solo si ambas entradas son válidas
         val validForm = email.isNotEmpty() && password.length in 6..10
         btnLogin.isEnabled = validForm
-
-        // Activar Registro con ambos campos llenos (HU 2.0)
         btnRegister.isEnabled = email.isNotEmpty() && password.isNotEmpty()
-
     }
 }

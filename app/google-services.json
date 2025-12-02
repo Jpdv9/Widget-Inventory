@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "509505534618",
+    "project_id": "widget-ae444",
+    "storage_bucket": "widget-ae444.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509505534618:android:df5821ed19f8d7d5a9bd23",
+        "android_client_info": {
+          "package_name": "com.example.widgetinventory"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6P6osJ6WKOlKpgBMz2_MiHsaLyqv_XIg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

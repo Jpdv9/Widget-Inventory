@@ -5,21 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.example.widgetinventory.data.repository.ProductRepository
 import com.example.widgetinventory.databinding.FragmentEditProductBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EditProductFragment : Fragment() {
 
     private var _binding: FragmentEditProductBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var viewModel: EditViewModel
-
-    // Obtiene los argumentos de navegación
-    private val args: EditProductFragmentArgs by navArgs()
+    //  Obtenemos el ViewModel con Hilt
+    private val viewModel: EditViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,19 +25,12 @@ class EditProductFragment : Fragment() {
     ): View {
         _binding = FragmentEditProductBinding.inflate(inflater, container, false)
 
-        // Configura la Factory y el ViewModel
-        val repository = ProductRepository()
-        val factory = EditViewModelFactory(repository, args.productId.toString())
-        viewModel = ViewModelProvider(this, factory)[EditViewModel::class.java]
 
-        // Conecta el ViewModel y el Lifecycle al DataBinding
         binding.viewModel = viewModel
-        binding.lifecycleOwner = this.viewLifecycleOwner
+        binding.lifecycleOwner = viewLifecycleOwner
 
-        // Observa la navegación
         viewModel.navigateBack.observe(viewLifecycleOwner) { navigate ->
             if (navigate == true) {
-                // Vuelve al fragmento anterior
                 findNavController().popBackStack()
                 viewModel.onNavigationDone()
             }
