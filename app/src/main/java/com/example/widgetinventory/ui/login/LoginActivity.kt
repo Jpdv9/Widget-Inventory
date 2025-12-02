@@ -28,11 +28,22 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // --- (La inicialización de vistas no cambia) ---
+        // --- NUEVO: Comprobación de sesión en onCreate ---
+        // Comprueba si ya hay un usuario con sesión iniciada
+        if (firebaseAuth.currentUser != null) {
+            // Si es así, salta directamente a la actividad principal
+            startActivity(Intent(this, MainActivity::class.java))
+            finish() // Cierra LoginActivity para que el usuario no pueda volver
+            return   // Importante: Salimos de onCreate para no inflar la vista de login
+        }
+
+        // Si no hay sesión, continuamos y mostramos la pantalla de login
+        setContentView(R.layout.activity_login)
+
+        // --- (El resto de tu código onCreate no cambia) ---
         inputEmail = findViewById(R.id.inputEmail)
         inputPassword = findViewById(R.id.inputPassword)
         emailLayout = findViewById(R.id.emailLayout)
@@ -70,27 +81,23 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        // Acción de Registrarse (ahora con lógica de Firebase)
+        // Acción de Registrarse
         btnRegister.setOnClickListener {
             val email = inputEmail.text.toString().trim()
             val password = inputPassword.text.toString().trim()
 
-            // Deshabilitamos los botones para dar feedback
             btnRegister.isEnabled = false
             btnLogin.isEnabled = false
             btnRegister.text = "REGISTRANDO..."
 
-            // Llamamos a Firebase para crear el usuario
             firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        // Si el registro es exitoso, informamos y vamos a la pantalla principal
                         Toast.makeText(this, "Registro exitoso. Iniciando sesión...", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
-                        finish() // Cerramos la LoginActivity
+                        finish()
                     } else {
-                        // Si el registro falla, mostramos el error y reactivamos los botones
                         Toast.makeText(this, "Error en el registro: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                         btnRegister.isEnabled = true
                         btnLogin.isEnabled = true

@@ -21,21 +21,23 @@ import javax.inject.Inject
 @HiltViewModel
 class EditViewModel @Inject constructor(
     private val repository: ProductRepository,
+    private val auth: FirebaseAuth, // Inyectamos FirebaseAuth
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     // Obtenemos el productId desde el SavedStateHandle
     private val productId: String = savedStateHandle.get<String>("productId")!!
 
-    private val productFlow = (FirebaseAuth.getInstance().currentUser?.uid?.let { userId ->
+    // Usamos la instancia inyectada de auth
+    private val productFlow = (auth.currentUser?.uid?.let { userId ->
         repository.getAllProducts(userId)
     } ?: emptyFlow()).map { productList ->
         productList.find { it.id == productId }
     }
     val product: LiveData<Product?> = productFlow.asLiveData()
 
-    val productIdText = product.map { p ->
-        p?.let { "Id: ${it.id}" } ?: "Id: (Producto no encontrado)"
+    val productCodeText = product.map { p ->
+        p?.let { "Código: ${it.code}" } ?: "Código: (Producto no encontrado)"
     }
 
     val editableName = MutableLiveData<String>()

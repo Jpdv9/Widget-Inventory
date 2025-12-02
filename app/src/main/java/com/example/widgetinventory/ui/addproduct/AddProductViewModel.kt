@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddProductViewModel @Inject constructor(
-    private val repository: ProductRepository
+    private val repository: ProductRepository,
+    private val auth: FirebaseAuth // Inyectamos FirebaseAuth
 ) : ViewModel() {
 
     // LiveData para los 4 campos de texto
@@ -55,7 +56,8 @@ class AddProductViewModel @Inject constructor(
         if (!areFieldsValid()) return
 
         try {
-            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+            // Usamos la instancia inyectada de auth
+            val userId = auth.currentUser?.uid ?: return
             // Creamos el producto con los datos de los LiveData
             val newProduct = Product(
                 id = "", // Se genera en la BD

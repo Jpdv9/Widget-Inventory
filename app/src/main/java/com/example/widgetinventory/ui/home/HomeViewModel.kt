@@ -1,26 +1,30 @@
 package com.example.widgetinventory.ui.home
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.widgetinventory.data.model.Product
 import com.example.widgetinventory.data.repository.ProductRepository
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val repository: ProductRepository,
+    private val auth: FirebaseAuth
+) : ViewModel() {
 
-    private val repository: ProductRepository = ProductRepository()
     val allProducts: Flow<List<Product>>
 
     init {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val userId = auth.currentUser?.uid
         allProducts = if (userId != null) {
             repository.getAllProducts(userId)
         } else {
-            emptyFlow()
+            flowOf(emptyList())
         }
     }
 
@@ -29,6 +33,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun signOut() {
-        FirebaseAuth.getInstance().signOut()
+        auth.signOut()
     }
 }
