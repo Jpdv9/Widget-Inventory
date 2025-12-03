@@ -17,7 +17,7 @@ class ProductAdapter(
 
     inner class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvName: TextView = view.findViewById(R.id.tvProductName)
-        val tvId: TextView = view.findViewById(R.id.tvProductId)
+        val tvCode: TextView = view.findViewById(R.id.tvProductCode)
         val tvPrice: TextView = view.findViewById(R.id.tvProductPrice)
     }
 
@@ -30,7 +30,7 @@ class ProductAdapter(
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = products[position]
         holder.tvName.text = product.name
-        holder.tvId.text = "ID: ${product.id}"
+        holder.tvCode.text = "Código: ${product.code}"
         val formatter = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
         holder.tvPrice.text = formatter.format(product.price)
         holder.itemView.setOnClickListener { onClick(product) }

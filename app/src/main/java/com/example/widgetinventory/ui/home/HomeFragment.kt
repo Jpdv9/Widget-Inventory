@@ -15,11 +15,15 @@ import com.example.widgetinventory.R
 import com.example.widgetinventory.databinding.FragmentHomeBinding
 import com.example.widgetinventory.ui.home.adapter.ProductAdapter
 import com.example.widgetinventory.ui.login.LoginActivity
+import dagger.hilt.android.AndroidEntryPoint // 1. Importar esto
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
+    // Hilt se encarga automáticamente de crear la instancia correcta aquí
     private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
@@ -28,6 +32,7 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
+        // Configuración del adaptador
         val adapter = ProductAdapter(emptyList()) { product ->
             val action = HomeFragmentDirections.actionHomeFragmentToProductDetailFragment(product.id)
             findNavController().navigate(action)
@@ -36,7 +41,9 @@ class HomeFragment : Fragment() {
         binding.recyclerProducts.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerProducts.adapter = adapter
 
+        // Observamos los datos
         viewModel.allProducts.asLiveData().observe(viewLifecycleOwner) { products ->
+            // Lógica simple: Si está vacía o cargando, muestra progress (puedes refinar esto luego)
             binding.progressBar.visibility = if (products.isNullOrEmpty()) View.VISIBLE else View.GONE
             adapter.updateList(products)
         }
@@ -51,11 +58,10 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Lógica de cerrar sesión
         binding.toolbar.findViewById<ImageView>(R.id.btnCerrarSesion).setOnClickListener {
-            // 1. Cerrar sesión en Firebase
             viewModel.signOut()
 
-            // 2. Navegar a LoginActivity y limpiar la pila
             val intent = Intent(requireContext(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)

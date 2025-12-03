@@ -22,197 +22,144 @@ class InventoryWidget : AppWidgetProvider() {
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
-
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        // Actualizar todos los widgets
         for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+            val pendingResult = goAsync()
+            updateAppWidget(context, appWidgetManager, appWidgetId, pendingResult)
         }
     }
 
     private fun updateAppWidget(
         context: Context,
         appWidgetManager: AppWidgetManager,
-        appWidgetId: Int
+        appWidgetId: Int,
+        pendingResult: PendingResult
     ) {
         val views = RemoteViews(context.packageName, R.layout.widget_inventory)
         val user = auth.currentUser
 
-        // --- GESTIONAR (Login o Home) ---
-        val loginIntent = Intent(context, LoginActivity::class.java).apply {
-            putExtra("fromWidget", true)
-        }
-
-        val homeIntent = Intent(context, MainActivity::class.java).apply {
-            putExtra("fromWidget", true)
-        }
-
-        val pendingManage = if (user == null) {
-            PendingIntent.getActivity(
-                context, 10, loginIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+        val manageIntent = if (user == null) {
+            Intent(context, LoginActivity::class.java)
         } else {
-            PendingIntent.getActivity(
-                context, 11, homeIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            Intent(context, MainActivity::class.java)
         }
-
+        val pendingManage = PendingIntent.getActivity(context, appWidgetId, manageIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         views.setOnClickPendingIntent(R.id.btn_manage, pendingManage)
         views.setOnClickPendingIntent(R.id.txt_manage, pendingManage)
 
-
-
-        // Si no hay usuario logueado el saldo estara oculto
         if (user == null) {
             views.setTextViewText(R.id.txt_balance, "$ ****")
             views.setImageViewResource(R.id.eye_icon, R.drawable.ic_eye_open)
-
-            // El ojo NO hace nada si no ha iniciado sesión
-            views.setOnClickPendingIntent(R.id.eye_icon, null)
-
             appWidgetManager.updateAppWidget(appWidgetId, views)
+            pendingResult.finish()
             return
         }
 
-        //  Si sí hay usuario logueado → permitir mostrar/ocultar
         views.setOnClickPendingIntent(R.id.eye_icon, getToggleBalanceIntent(context, appWidgetId))
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val isVisible = prefs.getBoolean("$BALANCE_VISIBLE_KEY$appWidgetId", false)
 
         if (isVisible) {
-            CoroutineScope(Dispatchers.IO).launch {
-                val balance = calculateTotalBalance(context)
-                withContext(Dispatchers.Main) {
-                    views.setTextViewText(R.id.txt_balance, "$${formatBalance(balance)}")
-                    views.setImageViewResource(R.id.eye_icon, R.drawable.ic_eye_closed)
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
+            scope.launch {
+                try {
+                    val balance = calculateTotalBalance()
+                    withContext(Dispatchers.Main) {
+                        views.setTextViewText(R.id.txt_balance, "$${formatBalance(balance)}")
+                        views.setImageViewResource(R.id.eye_icon, R.drawable.ic_eye_closed)
+                        appWidgetManager.updateAppWidget(appWidgetId, views)
+                    }
+                } finally {
+                    pendingResult.finish()
                 }
             }
         } else {
             views.setTextViewText(R.id.txt_balance, "$ ****")
             views.setImageViewResource(R.id.eye_icon, R.drawable.ic_eye_open)
             appWidgetManager.updateAppWidget(appWidgetId, views)
+            pendingResult.finish()
         }
     }
 
-    // Devuelve el PendingIntent para el Broadcast del "Ojo"
     private fun getToggleBalanceIntent(context: Context, appWidgetId: Int): PendingIntent {
-        val user = auth.currentUser
-
-        return if (user == null) {
-            // ❗ Usuario NO logueado → abrir LoginActivity (NO broadcast)
-            val loginIntent = Intent(context, LoginActivity::class.java).apply {
-                putExtra("fromWidget", true)
-            }
-
-            PendingIntent.getActivity(
-                context,
-                999, // requestCode único
-                loginIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-
-        } else {
-            // ✔ Usuario logueado → enviar BROADCAST al widget para hacer toggle
-            val intent = Intent(context, InventoryWidget::class.java).apply {
-                // Así se establece la acción correctamente
-                action = TOGGLE_BALANCE_ACTION
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-            }
-
-            PendingIntent.getBroadcast(
-                context,
-                appWidgetId,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+        val intent = Intent(context, InventoryWidget::class.java).apply {
+            action = TOGGLE_BALANCE_ACTION
+            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         }
+        return PendingIntent.getBroadcast(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-
-
-    // Recibe el Broadcast del "Ojo"
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-
         if (intent.action == TOGGLE_BALANCE_ACTION) {
-            val appWidgetId = intent.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID
-            )
-
+            val appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             if (appWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                // Llama a la función que actualiza el estado y la UI
-                toggleBalance(context, AppWidgetManager.getInstance(context), appWidgetId)
+                val pendingResult = goAsync()
+                toggleBalance(context, appWidgetId, pendingResult)
             }
         }
     }
 
-    // Cambia el estado (visible/oculto) y actualiza la UI
-    private fun toggleBalance(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetId: Int
-    ) {
+    private fun toggleBalance(context: Context, appWidgetId: Int, pendingResult: PendingResult) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
         val views = RemoteViews(context.packageName, R.layout.widget_inventory)
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val isBalanceVisible = prefs.getBoolean("$BALANCE_VISIBLE_KEY$appWidgetId", false)
 
         if (isBalanceVisible) {
-            // Si era visible, OCULTAR
             views.setTextViewText(R.id.txt_balance, "$ ****")
             views.setImageViewResource(R.id.eye_icon, R.drawable.ic_eye_open)
             prefs.edit().putBoolean("$BALANCE_VISIBLE_KEY$appWidgetId", false).apply()
             appWidgetManager.updateAppWidget(appWidgetId, views)
+            pendingResult.finish()
         } else {
-            // Si estaba oculto, MOSTRAR
-            CoroutineScope(Dispatchers.IO).launch {
-                val balance = calculateTotalBalance(context)
-                withContext(Dispatchers.Main) {
-                    views.setTextViewText(R.id.txt_balance, "$${formatBalance(balance)}")
-                    views.setImageViewResource(R.id.eye_icon, R.drawable.ic_eye_closed)
-                    prefs.edit().putBoolean("$BALANCE_VISIBLE_KEY$appWidgetId", true).apply()
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
+            scope.launch {
+                try {
+                    val balance = calculateTotalBalance()
+                    withContext(Dispatchers.Main) {
+                        views.setTextViewText(R.id.txt_balance, "$${formatBalance(balance)}")
+                        views.setImageViewResource(R.id.eye_icon, R.drawable.ic_eye_closed)
+                        prefs.edit().putBoolean("$BALANCE_VISIBLE_KEY$appWidgetId", true).apply()
+                        appWidgetManager.updateAppWidget(appWidgetId, views)
+                    }
+                } finally {
+                    pendingResult.finish()
                 }
             }
         }
     }
 
-    // Calcula el total del inventario
-    private suspend fun calculateTotalBalance(context: Context): Double {
+    private suspend fun calculateTotalBalance(): Double {
+        val user = auth.currentUser ?: return 0.0
         return try {
-            val snapshot = db.collection("products").get().await()
-            var total = 0.0
-
-            for (doc in snapshot.documents) {
+            val snapshot = db.collection("products")
+                .whereEqualTo("userId", user.uid)
+                .get()
+                .await()
+            snapshot.documents.sumOf { doc ->
                 val price = doc.getDouble("price") ?: 0.0
                 val quantity = doc.getLong("quantity")?.toInt() ?: 0
-                total += price * quantity
+                price * quantity
             }
-
-            total
         } catch (e: Exception) {
+            e.printStackTrace()
             0.0
         }
     }
 
-
-    // Formatea el saldo
     private fun formatBalance(balance: Double): String {
         val formatter = DecimalFormat("#,###.00", DecimalFormatSymbols(Locale.ENGLISH))
         return formatter.format(balance).replace(",", "X").replace(".", ",").replace("X", ".")
     }
 
     companion object {
-        const val TOGGLE_BALANCE_ACTION = "TOGGLE_BALANCE_ACTION"
+        const val TOGGLE_BALANCE_ACTION = "com.example.widgetinventory.TOGGLE_BALANCE_ACTION"
         const val PREFS_NAME = "InventoryWidgetPrefs"
         const val BALANCE_VISIBLE_KEY = "balance_visible_"
     }

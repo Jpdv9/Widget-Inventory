@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/color_negro_transparente"
+        android:fitsSystemWindows="true"
         tools:context=".ui.edit.EditProductFragment">
 
         <!-- Toolbar -->
@@ -44,16 +45,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- ID -->
+            <!-- Código -->
             <TextView
-                android:id="@+id/text_id"
+                android:id="@+id/text_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text='@{String.valueOf(viewModel.productIdText)}'
+                android:text="@{viewModel.productCodeText}"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                tools:text="Id: 12" />
+                tools:text="Código: 1234" />
 
             <Space
                 android:layout_width="match_parent"

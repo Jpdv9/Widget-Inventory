@@ -19,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val repository: ProductRepository,
-    savedStateHandle: SavedStateHandle //
+    private val auth: FirebaseAuth, // Inyectamos FirebaseAuth
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     // Obtenemos el productId desde el SavedStateHandle
@@ -29,7 +30,8 @@ class DetailViewModel @Inject constructor(
     val product: LiveData<Product?>
 
     init {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        // Usamos la instancia inyectada de auth
+        val userId = auth.currentUser?.uid
         val productsFlow = if (userId != null) {
             repository.getAllProducts(userId)
         } else {

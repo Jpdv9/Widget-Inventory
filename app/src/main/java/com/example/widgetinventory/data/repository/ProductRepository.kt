@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.channels.awaitClose
 
-class ProductRepository {
+open class ProductRepository {
 
     // Obtenemos la instancia de la base de datos de Firestore
     private val productsCollection = FirebaseFirestore.getInstance().collection("products")
